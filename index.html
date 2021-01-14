@@ -1,0 +1,245 @@
+<html>
+	<head>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs"></script>
+		<script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/blazeface"></script>
+		<meta charset="utf-8">
+		<title>Tensorflow.js在做什麼?有沒有空?可以來接我的頭嗎?</title>
+		<link rel="icon" type="image/x-icon" href="aqehp-uic48-001.ico">
+	</head>
+	<body>
+		<video width=640 height=480 autoplay muted id="camera"></video>
+		<canvas width=640 height=480 id="augmented_canvas"> </canvas>
+		<button id="lastPic">Last</button>	
+		<input type="checkbox" id="ck1">StarBurst	
+		<img src="replacehead.png" id="replacehead" style="display: none;" />
+		<img src="hd1.png" id="replacehead1" style="display: none;" />
+		<img src="hd2.png" id="replacehead2" style="display: none;" />
+		<img src="hd3.png" id="replacehead3" style="display: none;" />
+		<img src="hd4.png" id="replacehead4" style="display: none;" />
+		<img src="hd5.png" id="replacehead5" style="display: none;" />
+		<img src="hd6.png" id="replacehead6" style="display: none;" />
+		<img src="hd7.png" id="replacehead7" style="display: none;" />
+		<img src="hd8.png" id="replacehead8" style="display: none;" />
+		<img src="hd9.png" id="replacehead9" style="display: none;" />
+		<img src="hd10.png" id="replacehead10" style="display: none;" />
+		<img src="hd11.png" id="replacehead11" style="display: none;" />
+		<img src="hd12.png" id="replacehead12" style="display: none;" />
+		<img src="hd13.png" id="replacehead13" style="display: none;" />
+		<img src="hd14.png" id="replacehead14" style="display: none;" />
+		<img src="hd15.png" id="replacehead15" style="display: none;" />
+		<img src="hd16.png" id="replacehead16" style="display: none;" />
+		<img src="hd17.png" id="replacehead17" style="display: none;" />
+		<img src="hd18.png" id="replacehead18" style="display: none;" />
+		<img src="hd19.png" id="replacehead19" style="display: none;" />
+		<img src="hd20.png" id="replacehead20" style="display: none;" />
+		<img src="hd21.png" id="replacehead21" style="display: none;" />
+		<img src="hd22.png" id="replacehead22" style="display: none;" />
+		<img src="hd23.png" id="replacehead23" style="display: none;" />
+		<img src="hd24.png" id="replacehead24" style="display: none;" />
+		<img src="hd25.png" id="replacehead25" style="display: none;" />
+		<img src="hd26.png" id="replacehead26" style="display: none;" />
+		<img src="hd27.png" id="replacehead27" style="display: none;" />
+		<img src="hd28.png" id="replacehead28" style="display: none;" />
+		<img src="hd29.png" id="replacehead29" style="display: none;" />
+		<img src="hd30.png" id="replacehead30" style="display: none;" />
+		<img src="sble.png" id="starburstlefteye" style="display: none;" />
+		<img src="sbre.png" id="starburstrighteye" style="display: none;" />
+		<img src="sbmt.png" id="starburstmouth" style="display: none;" />
+		<script>
+			// face tracking to move objects in Virtual / Augmented world
+			var j = 0 ;
+			async function track_face()
+			{
+				// load camera stream
+				const frame = document.getElementById("camera");
+				const headimg = document.getElementById("replacehead");
+				const headimg1 = document.getElementById("replacehead1");
+				const headimg2 = document.getElementById("replacehead2");
+				const headimg3 = document.getElementById("replacehead3");
+				const headimg4 = document.getElementById("replacehead4");
+				const headimg5 = document.getElementById("replacehead5");
+				const headimg6 = document.getElementById("replacehead6");
+				const headimg7 = document.getElementById("replacehead7");
+				const headimg8 = document.getElementById("replacehead8");
+				const headimg9 = document.getElementById("replacehead9");
+				const headimg10 = document.getElementById("replacehead10");
+				const headimg11 = document.getElementById("replacehead11");
+				const headimg12 = document.getElementById("replacehead12");
+				const headimg13 = document.getElementById("replacehead13");
+				const headimg14 = document.getElementById("replacehead14");
+				const headimg15 = document.getElementById("replacehead15");
+				const headimg16 = document.getElementById("replacehead16");
+				const headimg17 = document.getElementById("replacehead17");
+				const headimg18 = document.getElementById("replacehead18");
+				const headimg19 = document.getElementById("replacehead19");
+				const headimg20 = document.getElementById("replacehead20");
+				const headimg21 = document.getElementById("replacehead21");
+				const headimg22 = document.getElementById("replacehead22");
+				const headimg23 = document.getElementById("replacehead23");
+				const headimg24 = document.getElementById("replacehead24");
+				const headimg25 = document.getElementById("replacehead25");
+				const headimg26 = document.getElementById("replacehead26");
+				const headimg27 = document.getElementById("replacehead27");
+				const headimg28 = document.getElementById("replacehead28");
+				const headimg29 = document.getElementById("replacehead29");
+				const headimg30 = document.getElementById("replacehead30");
+				const starburstlefteye = document.getElementById("starburstlefteye");
+				const starburstrighteye = document.getElementById("starburstrighteye");
+				const starburstmouth = document.getElementById("starburstmouth");
+				var checkBox1 = document.getElementById("ck1");
+				// prepare canvas
+				const canvas = document.getElementById("augmented_canvas");
+				const draw = canvas.getContext("2d");
+				
+				const lastPic = document.querySelector('#lastPic');
+				lastPic.addEventListener('click', (e) =>{ if (j>0)j--;});
+				// load blazeface model
+				const model = await blazeface.load();
+				var change = 0 ;
+				while(1)
+				{
+					// track face position
+					const result = await model.estimateFaces(frame, false);
+					// copy camera stream to canvas
+					draw.drawImage(frame, 0, 0, 640, 480);
+					// check if face is detected 
+					if(result.length > 0)
+					{
+					    for (let i = 0; i < result.length; i++) 
+					    {
+						  const start = result[i].topLeft;
+						  const end = result[i].bottomRight;
+						  const size = [end[0] - start[0] + 200, end[1] - start[1]+300];
+						  
+						  const righteye = result[i].landmarks[0];						  
+						  const lefteye = result[i].landmarks[1];
+						  const mouth = result[i].landmarks[3];
+						  // Render a headimg over each detected face.
+						  change = 0 ;
+						  if(checkBox1.checked)
+						  {
+							draw.drawImage(starburstlefteye, lefteye[0]-150, lefteye[1]-150, 300, 300);
+							draw.drawImage(starburstrighteye, righteye[0]-155, righteye[1]-165, 300, 300);
+							draw.drawImage(starburstmouth, mouth[0]-205, mouth[1]-190, 400, 400);
+							//console.log(righteye);
+							//console.log(lefteye);
+							//console.log(mouth);
+						  }
+						  else
+						  {
+							  if ( j % 31 == 0 )
+								draw.drawImage(headimg, start[0]-100, start[1]-200, size[0], size[1]);
+							  else if ( j % 31 == 1 )
+								draw.drawImage(headimg1, start[0]-100, start[1]-150, size[0]-50, size[1]-80);
+							  else if ( j % 31 == 2 )
+								draw.drawImage(headimg2, start[0]-80, start[1]-130, size[0]-50, size[1]-120);
+							  else if ( j % 31 == 3 )
+								draw.drawImage(headimg3, start[0]-80, start[1]-170, size[0]-50, size[1]-70);
+							  else if ( j % 31 == 4 )
+								draw.drawImage(headimg4, start[0]-60, start[1]-130, size[0]-100, size[1]-130);
+							  else if ( j % 31 == 5 )
+								draw.drawImage(headimg5, start[0]-60, start[1]-150, size[0]-100, size[1]-100);
+							  else if ( j % 31 == 6 )
+								draw.drawImage(headimg6, start[0]-50, start[1]-150, size[0]-90, size[1]-100);
+							  else if ( j % 31 == 7 )
+								draw.drawImage(headimg7, start[0]-80, start[1]-180, size[0], size[1]);
+							  else if ( j % 31 == 8 )
+								draw.drawImage(headimg8, start[0]-40, start[1]-140, size[0]-100, size[1]-100);
+							  else if ( j % 31 == 9 )
+								draw.drawImage(headimg9, start[0]-90, start[1]-200, size[0], size[1]);
+							  else if ( j % 31 == 10 )
+								draw.drawImage(headimg10, start[0]-90, start[1]-180, size[0], size[1]);
+							  else if ( j % 31 == 11 )
+								draw.drawImage(headimg11, start[0]-50, start[1]-160, size[0]-80, size[1]-80);
+							  else if ( j % 31 == 12 )
+								draw.drawImage(headimg12, start[0]-100, start[1]-170, size[0], size[1]);
+							  else if ( j % 31 == 13 )
+								draw.drawImage(headimg13, start[0]-70, start[1]-130, size[0]-80, size[1]-80);
+							  else if ( j % 31 == 14 )
+								draw.drawImage(headimg14, start[0]-100, start[1]-220, size[0]+20, size[1]+40);
+							  else if ( j % 31 == 15 )
+								draw.drawImage(headimg15, start[0]-100, start[1]-160, size[0], size[1]-50);
+							  else if ( j % 31 == 16 )
+								draw.drawImage(headimg16, start[0]-80, start[1]-160, size[0]-50, size[1]-50);
+							  else if ( j % 31 == 17 )
+								draw.drawImage(headimg17, start[0]-70, start[1]-160, size[0]-50, size[1]-50);
+							  else if ( j % 31 == 18 )
+								draw.drawImage(headimg18, start[0]-100, start[1]-160, size[0], size[1]);
+							  else if ( j % 31 == 19 )
+								draw.drawImage(headimg19, start[0]-90, start[1]-160, size[0]-30, size[1]-30);
+							  else if ( j % 31 == 20 )
+								draw.drawImage(headimg20, start[0]-100, start[1]-100, size[0], size[1]);
+							  else if ( j % 31 == 21 )
+								draw.drawImage(headimg21, start[0]-60, start[1]-170, size[0]-50, size[1]-50);
+							  else if ( j % 31 == 22 )
+								draw.drawImage(headimg22, start[0]-80, start[1]-160, size[0]-20, size[1]-20)  
+							  else if ( j % 31 == 23 )
+								draw.drawImage(headimg23, start[0]-60, start[1]-170, size[0]-50, size[1]-50);
+							  else if ( j % 31 == 24 )
+								draw.drawImage(headimg24, start[0]-60, start[1]-170, size[0]-60, size[1]-60);
+							  else if ( j % 31 == 25 )
+								draw.drawImage(headimg25, start[0]-60, start[1]-170, size[0]-70, size[1]-70);
+							  else if ( j % 31 == 26 )
+								draw.drawImage(headimg26, start[0]-70, start[1]-180, size[0]-50, size[1]-50);  
+							  else if ( j % 31 == 27 )
+								draw.drawImage(headimg27, start[0]-70, start[1]-210, size[0]-40, size[1]-40);
+							  else if ( j % 31 == 28 )
+								draw.drawImage(headimg28, start[0]-80, start[1]-210, size[0]-30, size[1]-30);
+							  else if ( j % 31 == 29 )
+								draw.drawImage(headimg29, start[0]-70, start[1]-200, size[0]-40, size[1]-40);
+							  else if ( j % 31 == 30 )
+								draw.drawImage(headimg30, start[0]-60, start[1]-180, size[0]-60, size[1]-60);
+							}
+					    }
+					}
+					else if(result.length == 0 )
+					{
+						if ( change == 0 )
+						{
+							j++ ;
+						}
+						change++ ;
+						// console.log(j) ;
+					}
+					// loop to process the next frame
+					await tf.nextFrame();
+				}
+			}
+		</script>
+		
+		<script>
+		function live_webcam()
+		{
+			// capture live video stream from web camera
+			if(navigator.mediaDevices.getUserMedia)
+			{
+				navigator.mediaDevices.getUserMedia({video: true})
+					.then(function (stream) {video.srcObject = stream; });
+			}
+		}
+		
+		
+
+		function main()
+		{
+			// check if the video is loaded and ready for processing
+			video = document.getElementById("camera");
+			if(video.readyState == 4)
+			{
+				console.log("video is ready for processing..");
+				track_face();
+			}
+			else
+			{
+				console.log("nope, not ready yet..");
+				setTimeout(main, 1000/30);
+			}
+		}
+		// capture live camera stream
+		live_webcam();
+		// detect gestures once the video is ready
+		main();
+
+	  </script>
+	</body>
+</html>
